@@ -196,7 +196,7 @@ void Game::CreateDeviceDependentResources()
 
     // デバッグフォントの作成
     m_debugFont = std::make_unique<Imase::DebugFont>(device, context
-        , L"Resoures/Font/SegoeUI_18.spritefont");
+        , L"Resources/Font/SegoeUI_18.spritefont");
 
     // グリッドの床の作成
     m_gridFloor = std::make_unique<Imase::GridFloor>(
