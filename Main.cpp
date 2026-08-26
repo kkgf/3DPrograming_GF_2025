@@ -25,7 +25,7 @@ namespace
                      WS_SYSMENU        | \
                      WS_MINIMIZEBOX )
 
-LPCWSTR g_szAppName = L"ゲームのタイトル名";
+LPCWSTR g_szAppName = L"MyGame";
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 void ExitGame() noexcept;
@@ -220,7 +220,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
 
     case WM_ACTIVATEAPP:
-        
+
         Keyboard::ProcessMessage(message, wParam, lParam);
         Mouse::ProcessMessage(message, wParam, lParam);
 
