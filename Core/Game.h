@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include "DeviceResources.h"
+#include "../Graphics/DeviceResources.h"
 #include "StepTimer.h"
-
 #include <memory>
+#include <SpriteBatch.h>
 
 
 // A basic game implementation that creates a D3D11 device and
@@ -57,7 +57,13 @@ private:
     void CreateDeviceDependentResources();
     void CreateWindowSizeDependentResources();
 
+    void CreatePixelTexture();
+    void RenderCenterPixel(DirectX::FXMVECTOR color = DirectX::Colors::White);
+    void DrawGrid(int spacing = 10, DirectX::FXMVECTOR color = DirectX::Colors::White);
+
     // Device resources.
+    std::unique_ptr<DirectX::SpriteBatch> m_spriteBatch;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_pixelTexture;
     std::unique_ptr<DX::DeviceResources>    m_deviceResources;
 
     // Rendering loop timer.

@@ -54,10 +54,10 @@ void Game::Tick()
 // Updates the world.
 void Game::Update(DX::StepTimer const& timer)
 {
-    float elapsedTime = float(timer.GetElapsedSeconds());
+    //float elapsedTime = static_cast<float>(timer.GetElapsedSeconds());
 
     // TODO: Add your game logic here.
-    elapsedTime;
+    //elapsedTime;
 }
 #pragma endregion
 
@@ -66,18 +66,16 @@ void Game::Update(DX::StepTimer const& timer)
 void Game::Render()
 {
     // Don't try to render anything before the first Update.
-    if (m_timer.GetFrameCount() == 0)
-    {
-        return;
-    }
+    if (m_timer.GetFrameCount() == 0)   return;
 
     Clear();
 
     m_deviceResources->PIXBeginEvent(L"Render");
-    auto context = m_deviceResources->GetD3DDeviceContext();
+    //auto context = m_deviceResources->GetD3DDeviceContext();
 
-    // TODO: Add your rendering code here.
-    context;
+    // Call the rendering function here
+    DrawGrid();
+    RenderCenterPixel(Colors::Red);
 
     m_deviceResources->PIXEndEvent();
 
@@ -95,7 +93,7 @@ void Game::Clear()
     auto renderTarget = m_deviceResources->GetRenderTargetView();
     auto depthStencil = m_deviceResources->GetDepthStencilView();
 
-    context->ClearRenderTargetView(renderTarget, Colors::Beige);
+    context->ClearRenderTargetView(renderTarget, Colors::Black);
     context->ClearDepthStencilView(depthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
     context->OMSetRenderTargets(1, &renderTarget, depthStencil);
 
@@ -165,10 +163,14 @@ void Game::GetDefaultSize(int& width, int& height) const noexcept
 // These are the resources that depend on the device.
 void Game::CreateDeviceDependentResources()
 {
-    auto device = m_deviceResources->GetD3DDevice();
+    //auto device = m_deviceResources->GetD3DDevice();
+    auto context = m_deviceResources->GetD3DDeviceContext();
 
-    // TODO: Initialize device dependent objects here (independent of window size).
-    device;
+    // Initialize SpriteBatch
+    m_spriteBatch = std::make_unique<SpriteBatch>(context);
+
+    // Create the 1x1 pixel texture
+    CreatePixelTexture();
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
@@ -177,9 +179,96 @@ void Game::CreateWindowSizeDependentResources()
     // TODO: Initialize windows-size dependent objects here.
 }
 
+/**
+ * Creates a 1x1 pixel texture that can be used for rendering a single pixel.
+ * The texture is created with a white color (0xFFFFFFFF) and is immutable.
+ */
+void Game::CreatePixelTexture()
+{
+    // this line gets the D3D device from the device resources, which is needed to create textures and other GPU resources
+    auto device = m_deviceResources->GetD3DDevice();
+
+    // Define a 1x1 raw RGBA pixel (white: 0xFFFFFFFF)
+    const uint32_t pixelColor = 0xFFFFFFFF;
+
+    // Set up the texture description and initial data for a 1x1 texture
+    D3D11_SUBRESOURCE_DATA initData = {};
+    initData.pSysMem = &pixelColor;
+    initData.SysMemPitch = sizeof(uint32_t);
+
+    D3D11_TEXTURE2D_DESC desc = {};
+    desc.Width = 1;
+    desc.Height = 1;
+    desc.MipLevels = 1;
+    desc.ArraySize = 1;
+    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    desc.SampleDesc.Count = 1;
+    desc.Usage = D3D11_USAGE_IMMUTABLE; // CPU won't modify this after creation
+    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+
+    // allocates gpu memory for the texture and creates a shader resource view for it, which can be used in shaders
+    ComPtr<ID3D11Texture2D> tex;
+    DX::ThrowIfFailed(device->CreateTexture2D(&desc, &initData, tex.GetAddressOf()));
+    DX::ThrowIfFailed(device->CreateShaderResourceView(tex.Get(), nullptr, m_pixelTexture.ReleaseAndGetAddressOf()));
+}
+
+/**
+ * Renders a single pixel at the center of the screen.
+ */
+void Game::RenderCenterPixel(DirectX::FXMVECTOR color)
+{
+    const auto viewport = m_deviceResources->GetScreenViewport();
+
+    // Calculate center screen coordinates (offset by 0.5 for pixel alignment)
+    const float centerX = (viewport.Width * 0.5f) - 0.5f;
+    const float centerY = (viewport.Height * 0.5f) - 0.5f;
+
+    m_spriteBatch->Begin();
+
+    // Draw the 1x1 texture at exact center. Color tinting can be changed via DirectX::Colors
+    m_spriteBatch->Draw(
+        m_pixelTexture.Get(),
+        XMFLOAT2(centerX, centerY),
+        nullptr,
+        color
+    );
+
+    m_spriteBatch->End();
+}
+
+/**
+ * Draws a grid of pixels across the entire screen with specified spacing and color.
+ * @param spacing The distance in pixels between each grid point.
+ * @param color The color of the grid points, specified as a DirectX::FXMVECTOR.
+ */
+void Game::DrawGrid(int spacing, DirectX::FXMVECTOR color)
+{
+    const auto viewport = m_deviceResources->GetScreenViewport();
+
+    m_spriteBatch->Begin();
+
+    // Loop through the screen height and width in steps of 'spacing'
+    for (int y = 0.0f; y < viewport.Height; y += spacing)
+    {
+        for (int x = 0.0f; x < viewport.Width; x += spacing)
+        {
+            m_spriteBatch->Draw(
+                m_pixelTexture.Get(),
+                DirectX::XMFLOAT2(x, y),
+                nullptr,
+                color
+            );
+        }
+    }
+
+    m_spriteBatch->End();
+}
+
 void Game::OnDeviceLost()
 {
-    // TODO: Add Direct3D resource cleanup here.
+    // Clean up GPU-dependent resources when Direct3D device is reset/lost
+    m_spriteBatch.reset();
+    m_pixelTexture.Reset();
 }
 
 void Game::OnDeviceRestored()
