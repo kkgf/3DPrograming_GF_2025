@@ -76,6 +76,7 @@ void Game::Render()
     // Call the rendering function here
     DrawGrid();
     RenderCenterPixel(Colors::Red);
+    DrawRectangle(100, 100, 200, 150, Colors::CornflowerBlue);
 
     m_deviceResources->PIXEndEvent();
 
@@ -261,6 +262,28 @@ void Game::DrawGrid(int spacing, DirectX::FXMVECTOR color)
         }
     }
 
+    m_spriteBatch->End();
+}
+
+/**
+ * Draws a rectangle on the screen using the 1x1 pixel texture.
+ * @param x The x-coordinate of the top-left corner of the rectangle.
+ * @param y The y-coordinate of the top-left corner of the rectangle.
+ * @param width The width of the rectangle in pixels.
+ * @param height The height of the rectangle in pixels.
+ * @param color The color of the rectangle, specified as a DirectX::FXMVECTOR.
+ */
+void Game::DrawRectangle(int x, int y, int width, int height, DirectX::FXMVECTOR color)
+{
+    RECT destination = { x, y, x + width, y + height };
+
+    m_spriteBatch->Begin();
+    m_spriteBatch->Draw(
+        m_pixelTexture.Get(),
+        destination,
+        nullptr,
+        color
+    );
     m_spriteBatch->End();
 }
 

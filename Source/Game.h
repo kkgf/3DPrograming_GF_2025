@@ -60,6 +60,7 @@ private:
     void CreatePixelTexture();
     void RenderCenterPixel(DirectX::FXMVECTOR color = DirectX::Colors::White);
     void DrawGrid(int spacing = 10, DirectX::FXMVECTOR color = DirectX::Colors::White);
+    void DrawRectangle(int x, int y, int width, int height, DirectX::FXMVECTOR color = DirectX::Colors::White);
 
     // Device resources.
     std::unique_ptr<DirectX::SpriteBatch> m_spriteBatch;
