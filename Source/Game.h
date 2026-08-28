@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "DeviceResources.h"
+#include "../Graphics/DeviceResources.h"
 #include "StepTimer.h"
 
 #include <memory>
