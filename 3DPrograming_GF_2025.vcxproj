@@ -217,4 +217,18 @@
     </PropertyGroup>
     <Error Condition="!Exists('packages\directxtk_desktop_win10.2026.5.8.1\build\native\directxtk_desktop_win10.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\directxtk_desktop_win10.2026.5.8.1\build\native\directxtk_desktop_win10.targets'))" />
   </Target>
+  <ItemGroup>
+    <MeshObjects Include="$(ProjectDir)Resources\Models\*.obj" />
+    <MeshTextures Include="$(ProjectDir)Resources\Models\*.png" />
+    <MeshTextures Include="$(ProjectDir)Resources\Models\*.jpg" />
+    <MeshTextures Include="$(ProjectDir)Resources\Models\*.jpeg" />
+    <MeshTextures Include="$(ProjectDir)Resources\Models\*.tga" />
+  </ItemGroup>
+  
+  <Target Name="ConvertModels" BeforeTargets="Build">
+    <!-- Convert source textures to DDS -->
+    <Exec Command="&quot;$(ProjectDir)Tools\texconv.exe&quot; -y -o &quot;$(ProjectDir)Resources\Models&quot; &quot;%(MeshTextures.Identity)&quot;" />
+    <!-- Convert OBJ files to SDKMESH -->
+    <Exec Command="&quot;$(ProjectDir)Tools\meshconvert.exe&quot; &quot;%(MeshObjects.Identity)&quot; -ft sdkmesh -y -o &quot;$(ProjectDir)Resources\Models\%(MeshObjects.Filename).sdkmesh&quot;" />
+  </Target>
 </Project>

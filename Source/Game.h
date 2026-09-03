@@ -67,6 +67,15 @@ private:
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_pixelTexture;
     std::unique_ptr<DX::DeviceResources>    m_deviceResources;
 
+    std::unique_ptr<DirectX::EffectFactory> m_fxFactory;
+    std::unique_ptr<DirectX::Model>         m_model;
+    DirectX::SimpleMath::Matrix             m_world;
+    DirectX::SimpleMath::Matrix             m_view;
+    DirectX::SimpleMath::Matrix             m_proj;
+
     // Rendering loop timer.
     DX::StepTimer                           m_timer;
+
+    // DirectXTK common states helper
+    std::unique_ptr<DirectX::CommonStates> m_states;
 };

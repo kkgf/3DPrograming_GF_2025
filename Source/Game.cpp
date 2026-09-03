@@ -71,12 +71,18 @@ void Game::Render()
     Clear();
 
     m_deviceResources->PIXBeginEvent(L"Render");
-    //auto context = m_deviceResources->GetD3DDeviceContext();
+    auto context = m_deviceResources->GetD3DDeviceContext();
 
-    // Call the rendering function here
-    DrawGrid();
-    RenderCenterPixel(Colors::Red);
-    DrawRectangle(100, 100, 200, 150, Colors::CornflowerBlue);
+    //// Call the rendering function here
+    //DrawGrid();
+    //RenderCenterPixel(Colors::Red);
+    //DrawRectangle(100, 100, 200, 150, Colors::CornflowerBlue);
+
+    // Render the loaded mesh
+    if (m_model)
+    {
+        m_model->Draw(context, *m_states, m_world, m_view, m_proj);
+    }
 
     m_deviceResources->PIXEndEvent();
 
@@ -164,20 +170,48 @@ void Game::GetDefaultSize(int& width, int& height) const noexcept
 // These are the resources that depend on the device.
 void Game::CreateDeviceDependentResources()
 {
-    //auto device = m_deviceResources->GetD3DDevice();
+    auto device = m_deviceResources->GetD3DDevice();
     auto context = m_deviceResources->GetD3DDeviceContext();
 
-    // Initialize SpriteBatch
-    m_spriteBatch = std::make_unique<SpriteBatch>(context);
+    // Common rendering states
+    m_states = std::make_unique<CommonStates>(device);
 
-    // Create the 1x1 pixel texture
+    // Sprite rendering
+    m_spriteBatch = std::make_unique<SpriteBatch>(context);
     CreatePixelTexture();
+
+    // Model rendering
+    m_fxFactory = std::make_unique<EffectFactory>(device);
+    m_fxFactory->SetDirectory(L"Resources/Models");
+
+    m_model = Model::CreateFromSDKMESH(
+        device,
+        L"Resources/Models/Duck1.sdkmesh",
+        *m_fxFactory
+    );
+
+    m_world = DirectX::SimpleMath::Matrix::Identity;
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
 void Game::CreateWindowSizeDependentResources()
 {
-    // TODO: Initialize windows-size dependent objects here.
+    auto size = m_deviceResources->GetOutputSize();
+    float aspectRatio = float(size.right) / float(size.bottom);
+
+    // Set camera position (adjust position coordinates based on model scale)
+    m_view = DirectX::SimpleMath::Matrix::CreateLookAt(
+        DirectX::SimpleMath::Vector3(0.0f, 2.0f, -5.0f), // Camera position
+        DirectX::SimpleMath::Vector3(0.0f, 0.0f, 0.0f),  // Target position
+        DirectX::SimpleMath::Vector3(0.0f, 1.0f, 0.0f)   // Up vector
+    );
+
+    m_proj = DirectX::SimpleMath::Matrix::CreatePerspectiveFieldOfView(
+        DirectX::XMConvertToRadians(45.0f),
+        aspectRatio,
+        0.1f,
+        1000.0f
+    );
 }
 
 /**

@@ -86,4 +86,7 @@ namespace DX
 
 // DirectXTK
 #include "Keyboard.h"
-
+#include <CommonStates.h>
+#include <Model.h>
+#include <Effects.h>
+#include <SimpleMath.h>
