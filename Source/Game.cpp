@@ -283,13 +283,13 @@ void Game::DrawGrid(int spacing, DirectX::FXMVECTOR color)
     m_spriteBatch->Begin();
 
     // Loop through the screen height and width in steps of 'spacing'
-    for (int y = 0.0f; y < viewport.Height; y += spacing)
+    for (int y = 0; y < viewport.Height; y += spacing)
     {
-        for (int x = 0.0f; x < viewport.Width; x += spacing)
+        for (int x = 0; x < viewport.Width; x += spacing)
         {
             m_spriteBatch->Draw(
                 m_pixelTexture.Get(),
-                DirectX::XMFLOAT2(x, y),
+                DirectX::XMFLOAT2(static_cast<float>(x), static_cast<float>(y)),
                 nullptr,
                 color
             );
