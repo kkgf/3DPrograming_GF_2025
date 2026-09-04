@@ -219,16 +219,21 @@
   </Target>
   <ItemGroup>
     <MeshObjects Include="$(ProjectDir)Resources\Models\*.obj" />
-    <MeshTextures Include="$(ProjectDir)Resources\Models\*.png" />
-    <MeshTextures Include="$(ProjectDir)Resources\Models\*.jpg" />
-    <MeshTextures Include="$(ProjectDir)Resources\Models\*.jpeg" />
-    <MeshTextures Include="$(ProjectDir)Resources\Models\*.tga" />
+    <MeshTextures Include="$(ProjectDir)Resources\Models\*.png;$(ProjectDir)Resources\Models\*.jpg;$(ProjectDir)Resources\Models\*.jpeg;$(ProjectDir)Resources\Models\*.tga" />
   </ItemGroup>
-  
-  <Target Name="ConvertModels" BeforeTargets="Build">
+
+  <!-- Incremental target: only runs when source .obj or texture files are newer than outputs -->
+  <Target Name="ConvertModels" 
+          BeforeTargets="Build"
+          Inputs="@(MeshTextures);@(MeshObjects)" 
+          Outputs="@(MeshTextures->'$(ProjectDir)Resources\Models\%(Filename).dds');@(MeshObjects->'$(ProjectDir)Resources\Models\%(Filename).sdkmesh')">
+    
     <!-- Convert source textures to DDS -->
-    <Exec Command="&quot;$(ProjectDir)Tools\texconv.exe&quot; -y -o &quot;$(ProjectDir)Resources\Models&quot; &quot;%(MeshTextures.Identity)&quot;" />
-    <!-- Convert OBJ files to SDKMESH -->
-    <Exec Command="&quot;$(ProjectDir)Tools\meshconvert.exe&quot; &quot;%(MeshObjects.Identity)&quot; -ft sdkmesh -y -o &quot;$(ProjectDir)Resources\Models\%(MeshObjects.Filename).sdkmesh&quot;" />
+    <Exec Command="&quot;$(ProjectDir)Tools\texconv.exe&quot; -y -o &quot;$(ProjectDir)Resources\Models&quot; &quot;%(MeshTextures.Identity)&quot;"
+          Condition="Exists('$(ProjectDir)Tools\texconv.exe') AND '@(MeshTextures)' != ''" />
+    
+    <!-- Convert OBJ files to SDKMESH with UV, Z-axis, and face winding corrections -->
+    <Exec Command="&quot;$(ProjectDir)Tools\meshconvert.exe&quot; &quot;%(MeshObjects.Identity)&quot; -ft sdkmesh -flipv -flipu -flipz -flip -y -o &quot;$(ProjectDir)Resources\Models\%(MeshObjects.Filename).sdkmesh&quot;"
+          Condition="Exists('$(ProjectDir)Tools\meshconvert.exe') AND '@(MeshObjects)' != ''" />
   </Target>
 </Project>

@@ -71,18 +71,12 @@ void Game::Render()
     Clear();
 
     m_deviceResources->PIXBeginEvent(L"Render");
-    auto context = m_deviceResources->GetD3DDeviceContext();
+    //auto context = m_deviceResources->GetD3DDeviceContext();
 
-    //// Call the rendering function here
-    //DrawGrid();
-    //RenderCenterPixel(Colors::Red);
-    //DrawRectangle(100, 100, 200, 150, Colors::CornflowerBlue);
-
-    // Render the loaded mesh
-    if (m_model)
-    {
-        m_model->Draw(context, *m_states, m_world, m_view, m_proj);
-    }
+    // Call the rendering function here
+    DrawGrid();
+    RenderCenterPixel(Colors::Red);
+    DrawRectangle(100, 100, 200, 150, Colors::CornflowerBlue);
 
     m_deviceResources->PIXEndEvent();
 
@@ -170,48 +164,20 @@ void Game::GetDefaultSize(int& width, int& height) const noexcept
 // These are the resources that depend on the device.
 void Game::CreateDeviceDependentResources()
 {
-    auto device = m_deviceResources->GetD3DDevice();
+    //auto device = m_deviceResources->GetD3DDevice();
     auto context = m_deviceResources->GetD3DDeviceContext();
 
-    // Common rendering states
-    m_states = std::make_unique<CommonStates>(device);
-
-    // Sprite rendering
+    // Initialize SpriteBatch
     m_spriteBatch = std::make_unique<SpriteBatch>(context);
+
+    // Create the 1x1 pixel texture
     CreatePixelTexture();
-
-    // Model rendering
-    m_fxFactory = std::make_unique<EffectFactory>(device);
-    m_fxFactory->SetDirectory(L"Resources/Models");
-
-    m_model = Model::CreateFromSDKMESH(
-        device,
-        L"Resources/Models/Monkey1.sdkmesh",
-        *m_fxFactory
-    );
-
-    m_world = DirectX::SimpleMath::Matrix::Identity;
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
 void Game::CreateWindowSizeDependentResources()
 {
-    auto size = m_deviceResources->GetOutputSize();
-    float aspectRatio = float(size.right) / float(size.bottom);
-
-    // Set camera position (adjust position coordinates based on model scale)
-    m_view = DirectX::SimpleMath::Matrix::CreateLookAt(
-        DirectX::SimpleMath::Vector3(0.0f, 2.0f, -5.0f), // Camera position
-        DirectX::SimpleMath::Vector3(0.0f, 0.0f, 0.0f),  // Target position
-        DirectX::SimpleMath::Vector3(0.0f, 1.0f, 0.0f)   // Up vector
-    );
-
-    m_proj = DirectX::SimpleMath::Matrix::CreatePerspectiveFieldOfView(
-        DirectX::XMConvertToRadians(45.0f),
-        aspectRatio,
-        0.1f,
-        1000.0f
-    );
+    // TODO: Initialize windows-size dependent objects here.
 }
 
 /**
@@ -283,13 +249,13 @@ void Game::DrawGrid(int spacing, DirectX::FXMVECTOR color)
     m_spriteBatch->Begin();
 
     // Loop through the screen height and width in steps of 'spacing'
-    for (int y = 0; y < viewport.Height; y += spacing)
+    for (int y = 0.0f; y < viewport.Height; y += spacing)
     {
-        for (int x = 0; x < viewport.Width; x += spacing)
+        for (int x = 0.0f; x < viewport.Width; x += spacing)
         {
             m_spriteBatch->Draw(
                 m_pixelTexture.Get(),
-                DirectX::XMFLOAT2(static_cast<float>(x), static_cast<float>(y)),
+                DirectX::XMFLOAT2(x, y),
                 nullptr,
                 color
             );
