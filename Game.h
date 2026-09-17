@@ -62,4 +62,9 @@ private:
 
     // Rendering loop timer.
     DX::StepTimer                           m_timer;
+
+    // ②追加。三角形描画（レンダリング）用
+    std::unique_ptr<DirectX::BasicEffect> m_effect;
+    std::unique_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>> m_primitiveBatch;
+    Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
 };

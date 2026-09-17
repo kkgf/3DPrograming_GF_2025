@@ -76,8 +76,39 @@ void Game::Render()
     m_deviceResources->PIXBeginEvent(L"Render");
     auto context = m_deviceResources->GetD3DDeviceContext();
 
-    // TODO: Add your rendering code here.
-    context;
+    // ④置換（＋実行）
+    // 3つのvertexを定義する。
+    VertexPositionColor vertex1(
+        XMFLOAT3(0.0f, 0.5f, 0.5f),// 位置
+        XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)// 色
+    );
+
+    VertexPositionColor vertex2(
+        XMFLOAT3(0.5f, -0.5f, 0.5f),
+        XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)
+    );
+
+    VertexPositionColor vertex3(
+        XMFLOAT3(-0.5f, -0.5f, 0.5f),
+        XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)
+    );
+
+    // 各vertexが持っているデータやどのようにメモリ内にレイアウトされているかをDirect3Dに伝える。
+    context->IASetInputLayout(m_inputLayout.Get());
+
+    // BasicEffectを有効にする
+    m_effect->Apply(context);
+
+    // 描画（PrimitiveBatch）を開始する
+    m_primitiveBatch->Begin();
+
+    m_primitiveBatch->DrawTriangle(
+        vertex1,
+        vertex2,
+        vertex3
+    );
+
+    m_primitiveBatch->End();
 
     m_deviceResources->PIXEndEvent();
 
@@ -165,10 +196,45 @@ void Game::GetDefaultSize(int& width, int& height) const noexcept
 // These are the resources that depend on the device.
 void Game::CreateDeviceDependentResources()
 {
+    // ③追加
     auto device = m_deviceResources->GetD3DDevice();
+    auto context = m_deviceResources->GetD3DDeviceContext();
 
-    // TODO: Initialize device dependent objects here (independent of window size).
-    device;
+    // BasicEffect
+    m_effect = std::make_unique<BasicEffect>(device);
+
+    // vertexの色を有効にする
+    m_effect->SetVertexColorEnabled(true);
+
+    // まずはすべての変換を単位行列として保持する
+    m_effect->SetWorld(XMMatrixIdentity());
+    m_effect->SetView(XMMatrixIdentity());
+    m_effect->SetProjection(XMMatrixIdentity());
+
+    // ここではPrimitiveBatchを作成する。
+    // PrimitiveBatchは描画の開始と終了を管理するクラスで、
+    // Begin()とEnd()の間にDraw()を呼ぶことで描画が行われる
+    m_primitiveBatch = std::make_unique<PrimitiveBatch<VertexPositionColor>>(context);
+
+    // m_effectでGetVertexShaderBytecodeを呼び出し
+    // shaderByteCodeやbyteCodeLengthに後に作る入力レイアウトに必要な情報をセットする
+    void const* shaderByteCode;
+    size_t byteCodeLength;
+
+    m_effect->GetVertexShaderBytecode(
+        &shaderByteCode,
+        &byteCodeLength
+    );
+
+    DX::ThrowIfFailed(
+        device->CreateInputLayout(
+            VertexPositionColor::InputElements,
+            VertexPositionColor::InputElementCount,
+            shaderByteCode,
+            byteCodeLength,
+            m_inputLayout.ReleaseAndGetAddressOf()
+        )
+    );
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.

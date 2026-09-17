@@ -86,4 +86,7 @@ namespace DX
 
 // DirectXTK
 #include "Keyboard.h"
-
+// ‡@’Ç‰Á
+#include "Effects.h"
+#include "PrimitiveBatch.h"
+#include "VertexTypes.h"
