@@ -78,19 +78,24 @@ void Game::Render()
 
     // ④置換（＋実行）
     // 3つのvertexを定義する。
-    VertexPositionColor vertex1(
-        XMFLOAT3(0.0f, 0.5f, 0.5f),// 位置
+    VertexPositionColor a(
+        XMFLOAT3(-0.5f, 0.5f, 3.1f),
         XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)// 色
     );
 
-    VertexPositionColor vertex2(
-        XMFLOAT3(0.5f, -0.5f, 0.5f),
+    VertexPositionColor b(
+        XMFLOAT3(0.5f, 0.5f, 0.0f),
         XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)
     );
 
-    VertexPositionColor vertex3(
-        XMFLOAT3(-0.5f, -0.5f, 0.5f),
+    VertexPositionColor c(
+        XMFLOAT3(0.5f, -0.5f, 0.0f),
         XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)
+    );
+
+    VertexPositionColor d(
+        XMFLOAT3(-0.5f, -0.5f, 0.0f),
+        XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f)
     );
 
     // 各vertexが持っているデータやどのようにメモリ内にレイアウトされているかをDirect3Dに伝える。
@@ -102,11 +107,7 @@ void Game::Render()
     // 描画（PrimitiveBatch）を開始する
     m_primitiveBatch->Begin();
 
-    m_primitiveBatch->DrawTriangle(
-        vertex1,
-        vertex2,
-        vertex3
-    );
+    m_primitiveBatch->DrawQuad(a, b, c, d);
 
     m_primitiveBatch->End();
 

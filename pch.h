@@ -90,3 +90,4 @@ namespace DX
 #include "Effects.h"
 #include "PrimitiveBatch.h"
 #include "VertexTypes.h"
+#include "SimpleMath.h"
