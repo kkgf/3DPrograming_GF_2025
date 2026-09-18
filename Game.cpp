@@ -107,7 +107,145 @@ void Game::Render()
     // 描画（PrimitiveBatch）を開始する
     m_primitiveBatch->Begin();
 
-    m_primitiveBatch->DrawQuad(a, b, c, d);
+// =====================================================
+// HOUSE BODY
+// =====================================================
+
+    VertexPositionColor topLeft(
+        XMFLOAT3(-0.45f, 0.20f, 0.5f),
+        XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)
+    );
+
+    VertexPositionColor topRight(
+        XMFLOAT3(0.45f, 0.20f, 0.5f),
+        XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)
+    );
+
+    VertexPositionColor bottomRight(
+        XMFLOAT3(0.45f, -0.65f, 0.5f),
+        XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)
+    );
+
+    VertexPositionColor bottomLeft(
+        XMFLOAT3(-0.45f, -0.65f, 0.5f),
+        XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)
+    );
+
+    // Rectangle = two triangles
+    m_primitiveBatch->DrawTriangle(
+        topLeft,
+        topRight,
+        bottomRight
+    );
+
+    m_primitiveBatch->DrawTriangle(
+        topLeft,
+        bottomRight,
+        bottomLeft
+    );
+
+    // =====================================================
+    // ROOF
+    // =====================================================
+
+    VertexPositionColor roofTop(
+        XMFLOAT3(0.0f, 0.70f, 0.5f),
+        XMFLOAT4(0.1f, 0.0f, 0.0f, 1.0f)
+    );
+
+    VertexPositionColor roofLeft(
+        XMFLOAT3(-0.55f, 0.20f, 0.5f),
+        XMFLOAT4(0.1f, 0.0f, 0.0f, 1.0f)
+    );
+
+    VertexPositionColor roofRight(
+        XMFLOAT3(0.55f, 0.20f, 0.5f),
+        XMFLOAT4(0.1f, 0.0f, 0.0f, 1.0f)
+    );
+
+    m_primitiveBatch->DrawTriangle(
+        roofTop,
+        roofRight,
+        roofLeft
+    );
+
+
+    // =====================================================
+    // DOOR
+    // =====================================================
+
+    // Slightly closer to the camera than the wall.
+    // This avoids depth fighting with the wall.
+    constexpr float frontZ = 0.4f;
+
+    VertexPositionColor doorTopLeft(
+        XMFLOAT3(-0.12f, -0.25f, frontZ),
+        XMFLOAT4(0.6f, 0.4f, 0.2f, 1.0f)
+    );
+
+    VertexPositionColor doorTopRight(
+        XMFLOAT3(0.12f, -0.25f, frontZ),
+        XMFLOAT4(0.6f, 0.4f, 0.2f, 1.0f)
+    );
+
+    VertexPositionColor doorBottomRight(
+        XMFLOAT3(0.12f, -0.65f, frontZ),
+        XMFLOAT4(0.6f, 0.4f, 0.2f, 1.0f)
+    );
+
+    VertexPositionColor doorBottomLeft(
+        XMFLOAT3(-0.12f, -0.65f, frontZ),
+        XMFLOAT4(0.6f, 0.4f, 0.2f, 1.0f)
+    );
+
+    m_primitiveBatch->DrawTriangle(
+        doorTopLeft,
+        doorTopRight,
+        doorBottomRight
+    );
+
+    m_primitiveBatch->DrawTriangle(
+        doorTopLeft,
+        doorBottomRight,
+        doorBottomLeft
+    );
+
+
+    // =====================================================
+    // WINDOW
+    // =====================================================
+
+    VertexPositionColor windowTopLeft(
+        XMFLOAT3(0.18f, 0.00f, frontZ),
+        XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f)
+    );
+
+    VertexPositionColor windowTopRight(
+        XMFLOAT3(0.36f, 0.00f, frontZ),
+        XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f)
+    );
+
+    VertexPositionColor windowBottomRight(
+        XMFLOAT3(0.36f, -0.18f, frontZ),
+        XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f)
+    );
+
+    VertexPositionColor windowBottomLeft(
+        XMFLOAT3(0.18f, -0.18f, frontZ),
+        XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f)
+    );
+
+    m_primitiveBatch->DrawTriangle(
+        windowTopLeft,
+        windowTopRight,
+        windowBottomRight
+    );
+
+    m_primitiveBatch->DrawTriangle(
+        windowTopLeft,
+        windowBottomRight,
+        windowBottomLeft
+    );
 
     m_primitiveBatch->End();
 
