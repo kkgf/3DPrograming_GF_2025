@@ -8,6 +8,7 @@
 extern void ExitGame() noexcept;
 
 using namespace DirectX;
+using namespace DirectX::SimpleMath;// ③追加
 
 using Microsoft::WRL::ComPtr;
 
@@ -76,8 +77,57 @@ void Game::Render()
     m_deviceResources->PIXBeginEvent(L"Render");
     auto context = m_deviceResources->GetD3DDeviceContext();
 
-    // TODO: Add your rendering code here.
-    context;
+    // ⑤置換
+    //描画の設定
+    context->OMSetBlendState(
+        m_states->Opaque(),
+        nullptr,
+        0xFFFFFFFF
+    );
+
+    context->OMSetDepthStencilState(m_states->DepthNone(),0);
+
+    context->RSSetState(m_states->CullNone());
+
+    // サンプリング方法をGPUに伝える
+    auto sampler = m_states->LinearClamp();
+    context->PSSetSamplers(0, 1, &sampler);
+
+    // Direct3Dにvertexに含まれる情報を伝える
+    context->IASetInputLayout(m_inputLayout.Get());
+
+    // どのように描画するかを決める
+    m_effect->Apply(context);
+
+    // 図形
+    VertexType topLeft(
+        Vector3(-0.7f, 0.7f, 0.5f),
+        Vector2(0.0f, 0.0f)
+    );
+
+    VertexType topRight(
+        Vector3(0.7f, 0.7f, 0.5f),
+        Vector2(1.0f, 0.0f)
+    );
+
+    VertexType bottomRight(
+        Vector3(0.7f, -0.7f, 0.5f),
+        Vector2(1.0f, 1.0f)
+    );
+
+    VertexType bottomLeft(
+        Vector3(-0.7f, -0.7f, 0.5f),
+        Vector2(0.0f, 1.0f)
+    );
+
+    // 2つの三角形を描画することで、四角形を描画する
+    m_batch->Begin();
+
+    m_batch->DrawTriangle(topLeft, topRight, bottomRight);
+
+    m_batch->DrawTriangle(topLeft, bottomRight, bottomLeft);
+
+    m_batch->End();
 
     m_deviceResources->PIXEndEvent();
 
@@ -166,9 +216,45 @@ void Game::GetDefaultSize(int& width, int& height) const noexcept
 void Game::CreateDeviceDependentResources()
 {
     auto device = m_deviceResources->GetD3DDevice();
+    // ④置換
+    auto context = m_deviceResources->GetD3DDeviceContext();
 
-    // TODO: Initialize device dependent objects here (independent of window size).
-    device;
+    // CommonStates
+    m_states = std::make_unique<CommonStates>(device);
+
+    // テクスチャの読み込み
+    DX::ThrowIfFailed(
+        CreateWICTextureFromFile(
+            device,
+            L"rocks.jpg",
+            nullptr,
+            m_texture.ReleaseAndGetAddressOf()
+        )
+    );
+
+    // BasicEffect作成
+    m_effect = std::make_unique<BasicEffect>(device);
+    // テクスチャを有効化（使えるようにする）
+    m_effect->SetTextureEnabled(true);
+    // BasicEffectにテクスチャをセット
+    m_effect->SetTexture(m_texture.Get());
+
+    // 各行列を単位行列にすることで、描画時の変換を行わないようにする
+    m_effect->SetWorld(XMMatrixIdentity());
+    m_effect->SetView(XMMatrixIdentity());
+    m_effect->SetProjection(XMMatrixIdentity());
+
+    // 入力レイアウトを作成
+    DX::ThrowIfFailed(
+        CreateInputLayoutFromEffect<VertexType>(
+            device,
+            m_effect.get(),
+            m_inputLayout.ReleaseAndGetAddressOf()
+        )
+    );
+
+    // PrimitiveBatch作成
+    m_batch = std::make_unique<PrimitiveBatch<VertexType>>(context);
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.

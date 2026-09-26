@@ -62,4 +62,16 @@ private:
 
     // Rendering loop timer.
     DX::StepTimer                           m_timer;
+
+    // ‡A’Ç‰Á
+    using VertexType = DirectX::VertexPositionTexture;
+
+    std::unique_ptr<DirectX::CommonStates> m_states;// •`‰æ‚Ìİ’è
+    std::unique_ptr<DirectX::BasicEffect> m_effect;// ‚Ç‚Ì‚æ‚¤‚É•`‰æ‚·‚é‚©‚ğŒˆ‚ß‚é
+
+    std::unique_ptr<DirectX::PrimitiveBatch<VertexType>> m_batch;// }Œ`
+
+    Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;// vertex‚Å‚Ç‚Ìî•ñ‚ªŠÜ‚Ü‚ê‚é‚Ì‚©
+
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_texture;// ‰æ‘œ
 };
