@@ -10,6 +10,8 @@ extern void ExitGame() noexcept;
 using namespace DirectX;
 
 using Microsoft::WRL::ComPtr;
+// ③追加
+using namespace DirectX::SimpleMath;
 
 Game::Game() noexcept(false)
 {
@@ -54,10 +56,13 @@ void Game::Tick()
 // Updates the world.
 void Game::Update(DX::StepTimer const& timer)
 {
-    float elapsedTime = float(timer.GetElapsedSeconds());
+    //float elapsedTime = float(timer.GetElapsedSeconds());
 
-    // TODO: Add your game logic here.
-    elapsedTime;
+    // ⑤ 30度回転させる
+    //m_world = Matrix::CreateRotationY( XMConvertToRadians(30.0f) );
+    // ⑥ 回転し続けさせる
+    //float angle = static_cast<float>(timer.GetTotalSeconds());
+    //m_world = Matrix::CreateRotationY(angle);
 }
 #pragma endregion
 
@@ -76,8 +81,13 @@ void Game::Render()
     m_deviceResources->PIXBeginEvent(L"Render");
     auto context = m_deviceResources->GetD3DDeviceContext();
 
-    // TODO: Add your rendering code here.
-    context;
+    // 立方体を描画
+    m_cube->Draw(
+        m_world,
+        m_view,
+        m_projection,
+        Colors::CornflowerBlue
+    );
 
     m_deviceResources->PIXEndEvent();
 
@@ -162,19 +172,50 @@ void Game::GetDefaultSize(int& width, int& height) const noexcept
 #pragma endregion
 
 #pragma region Direct3D Resources
-// These are the resources that depend on the device.
+// These are the (GPU) resources that depend on the device.
 void Game::CreateDeviceDependentResources()
 {
-    auto device = m_deviceResources->GetD3DDevice();
+    //auto device = m_deviceResources->GetD3DDevice();
+    // 置換
+    auto context = m_deviceResources->GetD3DDeviceContext();
 
-    // TODO: Initialize device dependent objects here (independent of window size).
-    device;
+    // ヘルパー関数に立方体を作ってもらってセット
+    m_cube = GeometricPrimitive::CreateCube(context);
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
 void Game::CreateWindowSizeDependentResources()
 {
-    // TODO: Initialize windows-size dependent objects here.
+    // ③追加
+    // カメラの座標
+    Vector3 cameraPosition(0.0f, 2.0f, 5.0f);
+
+    // カメラの向いている座標
+    Vector3 target(0.0f, 0.0f, 0.0f);
+
+    // 「上」のベクトル（0.0f, 1.0f, 0.0f）
+    Vector3 up = Vector3::Up;
+
+    m_view = Matrix::CreateLookAt(
+        cameraPosition,
+        target,
+        up
+    );
+
+    // 画面の縦横比を計算するために、ウィンドウのサイズを取得
+    auto size = m_deviceResources->GetOutputSize();
+    float width = static_cast<float>(size.right - size.left);
+    float height = static_cast<float>(size.bottom - size.top);
+    float aspectRatio = width / height;
+
+    // 透視投影行列を作成
+    m_projection =
+        Matrix::CreatePerspectiveFieldOfView(
+            XMConvertToRadians(45.0f),
+            aspectRatio,
+            0.1f,
+            100.0f
+        );
 }
 
 void Game::OnDeviceLost()

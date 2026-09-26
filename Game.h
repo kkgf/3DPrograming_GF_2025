@@ -62,4 +62,15 @@ private:
 
     // Rendering loop timer.
     DX::StepTimer                           m_timer;
+
+    // ②追加
+    // 3D オブジェクト
+    std::unique_ptr<DirectX::GeometricPrimitive> m_cube;
+
+    // ④ ワールド
+    DirectX::SimpleMath::Matrix m_world = DirectX::SimpleMath::Matrix::Identity;
+
+    // カメラ行列
+    DirectX::SimpleMath::Matrix m_view;
+    DirectX::SimpleMath::Matrix m_projection;
 };
