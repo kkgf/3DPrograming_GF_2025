@@ -78,7 +78,9 @@ void Game::Render()
     auto context = m_deviceResources->GetD3DDeviceContext();
 
     // ⑤置換
-    //描画の設定
+    // --------------------------------------
+    // 描画の設定
+    // --------------------------------------
     context->OMSetBlendState(
         m_states->Opaque(),
         nullptr,
@@ -96,10 +98,14 @@ void Game::Render()
     // Direct3Dにvertexに含まれる情報を伝える
     context->IASetInputLayout(m_inputLayout.Get());
 
-    // どのように描画するかを決める
+    // --------------------------------------
+    // BasicEffectを起動
+    // --------------------------------------
     m_effect->Apply(context);
 
+    // --------------------------------------
     // 図形
+    // --------------------------------------
     VertexType topLeft(
         Vector3(-0.7f, 0.7f, 0.5f),
         Vector2(0.0f, 0.0f)
@@ -120,7 +126,9 @@ void Game::Render()
         Vector2(0.0f, 1.0f)
     );
 
+    // --------------------------------------
     // 2つの三角形を描画することで、四角形を描画する
+    // --------------------------------------
     m_batch->Begin();
 
     m_batch->DrawTriangle(topLeft, topRight, bottomRight);
@@ -219,10 +227,14 @@ void Game::CreateDeviceDependentResources()
     // ④置換
     auto context = m_deviceResources->GetD3DDeviceContext();
 
-    // CommonStates
+    // --------------------------------------
+    // 一般的な描画設定をまとめたCommonStatesを作成
+    // --------------------------------------
     m_states = std::make_unique<CommonStates>(device);
 
+    // --------------------------------------
     // テクスチャの読み込み
+    // --------------------------------------
     DX::ThrowIfFailed(
         CreateWICTextureFromFile(
             device,
@@ -232,7 +244,9 @@ void Game::CreateDeviceDependentResources()
         )
     );
 
+    // --------------------------------------
     // BasicEffect作成
+    // --------------------------------------
     m_effect = std::make_unique<BasicEffect>(device);
     // テクスチャを有効化（使えるようにする）
     m_effect->SetTextureEnabled(true);
@@ -244,7 +258,9 @@ void Game::CreateDeviceDependentResources()
     m_effect->SetView(XMMatrixIdentity());
     m_effect->SetProjection(XMMatrixIdentity());
 
+    // --------------------------------------
     // 入力レイアウトを作成
+    // --------------------------------------
     DX::ThrowIfFailed(
         CreateInputLayoutFromEffect<VertexType>(
             device,
@@ -253,7 +269,9 @@ void Game::CreateDeviceDependentResources()
         )
     );
 
+    // --------------------------------------
     // PrimitiveBatch作成
+    // --------------------------------------
     m_batch = std::make_unique<PrimitiveBatch<VertexType>>(context);
 }
 
