@@ -218,10 +218,10 @@ void Game::CreateWindowSizeDependentResources()
 
     // 射影行列の作成
     m_proj = SimpleMath::Matrix::CreatePerspectiveFieldOfView(
-        // 画角　　　　　　　　　　アスペクト比
-        XMConvertToRadians(45.0f), static_cast<float>(w) / static_cast<float>(h),
-        // Near Far
-        0.1f, 100.0f);
+        XMConvertToRadians(45.0f), // 視野角
+        static_cast<float>(w) / static_cast<float>(h),// アスペク比（幅/高さ）
+        0.1f, // 最も近い可視距離
+        100.0f);// 最も遠い可視距離
 
 }
 
