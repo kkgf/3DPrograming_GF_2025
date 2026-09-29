@@ -10,7 +10,7 @@ extern void ExitGame() noexcept;
 using namespace DirectX;
 
 using Microsoft::WRL::ComPtr;
-// â‘¢è¿½åŠ 
+// ‡B’Ç‰Á
 using namespace DirectX::SimpleMath;
 
 Game::Game() noexcept(false)
@@ -58,9 +58,9 @@ void Game::Update(DX::StepTimer const& timer)
 {
     //float elapsedTime = float(timer.GetElapsedSeconds());
 
-    // â‘¤ 30åº¦å›è»¢ã•ã›ã‚‹
+    // ‡D 30“x‰ñ“]‚³‚¹‚é
     //m_world = Matrix::CreateRotationY( XMConvertToRadians(30.0f) );
-    // â‘¥ å›è»¢ã—ç¶šã‘ã•ã›ã‚‹
+    // ‡E ‰ñ“]‚µ‘±‚¯‚³‚¹‚é
     //float angle = static_cast<float>(timer.GetTotalSeconds());
     //m_world = Matrix::CreateRotationY(angle);
 }
@@ -81,7 +81,7 @@ void Game::Render()
     m_deviceResources->PIXBeginEvent(L"Render");
     auto context = m_deviceResources->GetD3DDeviceContext();
 
-    // ç«‹æ–¹ä½“ã‚’æç”»
+    // —§•û‘Ì‚ğ•`‰æ
     m_cube->Draw(
         m_world,
         m_view,
@@ -176,24 +176,24 @@ void Game::GetDefaultSize(int& width, int& height) const noexcept
 void Game::CreateDeviceDependentResources()
 {
     //auto device = m_deviceResources->GetD3DDevice();
-    // ç½®æ›
+    // ’uŠ·
     auto context = m_deviceResources->GetD3DDeviceContext();
 
-    // ãƒ˜ãƒ«ãƒ‘ãƒ¼é–¢æ•°ã«ç«‹æ–¹ä½“ã‚’ä½œã£ã¦ã‚‚ã‚‰ã£ã¦ã‚»ãƒƒãƒˆ
+    // ƒwƒ‹ƒp[ŠÖ”‚É—§•û‘Ì‚ğì‚Á‚Ä‚à‚ç‚Á‚ÄƒZƒbƒg
     m_cube = GeometricPrimitive::CreateCube(context);
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
 void Game::CreateWindowSizeDependentResources()
 {
-    // â‘¢è¿½åŠ 
-    // ã‚«ãƒ¡ãƒ©ã®åº§æ¨™
+    // ‡B’Ç‰Á
+    // ƒJƒƒ‰‚ÌÀ•W
     Vector3 cameraPosition(0.0f, 2.0f, 5.0f);
 
-    // ã‚«ãƒ¡ãƒ©ã®å‘ã„ã¦ã„ã‚‹åº§æ¨™
+    // ƒJƒƒ‰‚ÌŒü‚¢‚Ä‚¢‚éÀ•W
     Vector3 target(0.0f, 0.0f, 0.0f);
 
-    // ã€Œä¸Šã€ã®ãƒ™ã‚¯ãƒˆãƒ«ï¼ˆ0.0f, 1.0f, 0.0fï¼‰
+    // uãv‚ÌƒxƒNƒgƒ‹i0.0f, 1.0f, 0.0fj
     Vector3 up = Vector3::Up;
 
     m_view = Matrix::CreateLookAt(
@@ -202,20 +202,19 @@ void Game::CreateWindowSizeDependentResources()
         up
     );
 
-    // ç”»é¢ã®ç¸¦æ¨ªæ¯”ã‚’è¨ˆç®—ã™ã‚‹ãŸã‚ã«ã€ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®ã‚µã‚¤ã‚ºã‚’å–å¾—
+    // ‰æ–Ê‚Ìc‰¡”ä‚ğŒvZ‚·‚é‚½‚ß‚ÉAƒEƒBƒ“ƒhƒE‚ÌƒTƒCƒY‚ğæ“¾
     auto size = m_deviceResources->GetOutputSize();
     float width = static_cast<float>(size.right - size.left);
     float height = static_cast<float>(size.bottom - size.top);
     float aspectRatio = width / height;
 
-    // é€è¦–æŠ•å½±è¡Œåˆ—ã‚’ä½œæˆ
+    // “§‹“Š‰es—ñ‚ğì¬
     m_projection =
         Matrix::CreatePerspectiveFieldOfView(
-            XMConvertToRadians(45.0f),
-            aspectRatio,
-            0.1f,
-            100.0f
-        );
+            XMConvertToRadians(45.0f), // ‹–ìŠp
+            aspectRatio,// ƒAƒXƒyƒN”äi•/‚‚³j
+            0.1f, // Å‚à‹ß‚¢‰Â‹‹——£
+            100.0f);// Å‚à‰“‚¢‰Â‹‹——£
 }
 
 void Game::OnDeviceLost()
