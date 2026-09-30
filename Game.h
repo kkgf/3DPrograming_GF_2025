@@ -62,4 +62,16 @@ private:
 
     // Rendering loop timer.
     DX::StepTimer                           m_timer;
+
+    // ② 追加
+    // 3Dオブジェクト
+    std::unique_ptr<DirectX::GeometricPrimitive> m_cube;
+
+    // カメラ
+    DirectX::SimpleMath::Vector3 m_cameraPosition{ 0.0f, 2.0f, 6.0f };// カメラ初期位置
+    DirectX::SimpleMath::Vector3 m_cameraTarget{ 0.0f, 0.0f, 0.0f };// 常に減点を見つめる
+
+    // 行列
+    DirectX::SimpleMath::Matrix m_view;
+    DirectX::SimpleMath::Matrix m_projection;
 };

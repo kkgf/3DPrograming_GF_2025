@@ -8,6 +8,7 @@
 extern void ExitGame() noexcept;
 
 using namespace DirectX;
+using namespace DirectX::SimpleMath;// ③ 追加
 
 using Microsoft::WRL::ComPtr;
 
@@ -56,8 +57,59 @@ void Game::Update(DX::StepTimer const& timer)
 {
     float elapsedTime = float(timer.GetElapsedSeconds());
 
-    // TODO: Add your game logic here.
-    elapsedTime;
+    // ⑥ 追加
+    // キーボードの現在の状態を取得する
+    auto keyboard = Keyboard::Get().GetState();
+
+    // 移動速度：単位/秒
+    float speed = 3.0f * elapsedTime;
+
+    // 左右移動
+    if (keyboard.A)
+    {
+        m_cameraPosition.x -= speed;
+    }
+
+    if (keyboard.D)
+    {
+        m_cameraPosition.x += speed;
+    }
+
+    // 前後移動
+    if (keyboard.W)
+    {
+        m_cameraPosition.z -= speed;
+    }
+
+    if (keyboard.S)
+    {
+        m_cameraPosition.z += speed;
+    }
+
+    // 上下移動
+    if (keyboard.E)
+    {
+        m_cameraPosition.y += speed;
+    }
+
+    if (keyboard.Q)
+    {
+        m_cameraPosition.y -= speed;
+    }
+
+    // カメラが被写体に近づきすぎないようにする
+    if (m_cameraPosition.z < 1.0f)
+    {
+        m_cameraPosition.z = 1.0f;
+    }
+
+    // ビュー行列を作成
+    m_view =
+        Matrix::CreateLookAt(
+            m_cameraPosition,
+            m_cameraTarget,
+            Vector3::Up
+        );
 }
 #pragma endregion
 
@@ -76,8 +128,48 @@ void Game::Render()
     m_deviceResources->PIXBeginEvent(L"Render");
     auto context = m_deviceResources->GetD3DDeviceContext();
 
-    // TODO: Add your rendering code here.
-    context;
+    // ⑦ 追加
+    // 左に配置する立方体
+    Matrix worldLeft =
+        Matrix::CreateTranslation(
+            -2.0f,
+            0.0f,
+            0.0f
+        );
+
+    m_cube->Draw(
+        worldLeft,
+        m_view,
+        m_projection,
+        Colors::Red
+    );
+
+
+    // 真ん中に配置する立方体
+    Matrix worldCenter = Matrix::Identity;
+
+    m_cube->Draw(
+        worldCenter,
+        m_view,
+        m_projection,
+        Colors::Green
+    );
+
+
+    // 遠くに配置する立方体
+    Matrix worldBack =
+        Matrix::CreateTranslation(
+            2.0f,
+            0.0f,
+            -3.0f
+        );
+
+    m_cube->Draw(
+        worldBack,
+        m_view,
+        m_projection,
+        Colors::Blue
+    );
 
     m_deviceResources->PIXEndEvent();
 
@@ -167,14 +259,36 @@ void Game::CreateDeviceDependentResources()
 {
     auto device = m_deviceResources->GetD3DDevice();
 
-    // TODO: Initialize device dependent objects here (independent of window size).
-    device;
+    // ④ 追加
+    auto context = m_deviceResources->GetD3DDeviceContext();
+
+    m_cube =
+        GeometricPrimitive::CreateCube(
+            context,
+            1.0f
+        );
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
 void Game::CreateWindowSizeDependentResources()
 {
-    // TODO: Initialize windows-size dependent objects here.
+    // ⑤ 置換
+    auto size = m_deviceResources->GetOutputSize();
+
+    float width = static_cast<float>(size.right - size.left);
+
+    float height = static_cast<float>(size.bottom - size.top);
+
+    float aspectRatio = width / height;
+
+    // 投影は画面のアスペクト比に依存するので、ウィンドウサイズが変更されたときに更新する必要がある。
+    m_projection =
+        Matrix::CreatePerspectiveFieldOfView(
+            XMConvertToRadians(45.0f),
+            aspectRatio,
+            0.1f,
+            100.0f
+        );
 }
 
 void Game::OnDeviceLost()

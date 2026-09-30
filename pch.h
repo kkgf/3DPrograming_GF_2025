@@ -86,4 +86,6 @@ namespace DX
 
 // DirectXTK
 #include "Keyboard.h"
-
+// ‡@ ’Ç‰Á
+#include "GeometricPrimitive.h"
+#include "SimpleMath.h"
